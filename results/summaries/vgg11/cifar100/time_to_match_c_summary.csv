@@ -1,0 +1,6 @@
+Model,TimeToMatchRef(min)_mean,TimeToMatchRef(min)_std,TimeToMatchRef(s)_mean,TimeToMatchRef(s)_std,N_reached,N_total,RefModel,RefTargetAcc_mean,RefTargetAcc_std,RefAccMode,Streak,UseEndOfStreak,AccEps
+a,15.6824,1.4752,940.946667,88.511220,3,3,c,0.570553,0.002155,final5,3,1,0.000000
+b,15.4606,1.0327,927.636667,61.963330,3,3,c,0.570553,0.002155,final5,3,1,0.000000
+d,16.1468,0.5989,968.806667,35.931726,3,3,c,0.570553,0.002155,final5,3,1,0.000000
+e,16.7089,1.2115,1002.536667,72.691580,3,3,c,0.570553,0.002155,final5,3,1,0.000000
+f,34.4704,0.8659,2068.226667,51.953965,3,3,c,0.570553,0.002155,final5,3,1,0.000000
