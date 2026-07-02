@@ -63,13 +63,13 @@ matrices, convolution kernels, and head-wise attention projections.
 `Z` denotes a zero block and `N` a sampled nonzero block. The signatures follow
 the order `(new1, new2, new3)`.
 
-| Mode | Signature | Added-block rule | Function preserving |
+| Mode | Added-block rule | Function preserving |
 |---|---|---|---|
-| A — Column-Zero Initialization | `ZNN` | `new1=0`; sample the added row with the grown fan-in | Yes |
-| B — Row-First Column-Zero Initialization | `ZNZ` | sample `new2` with inherited fan-in; `new1=new3=0` | Yes |
-| C — Row-Zero Initialization (NZZ) | `NZZ` | sample `new1`; `new2=new3=0` | Yes |
-| D — Homogeneous Initialization | `NNN` | initialize every added block with the default grown-layer rule | No |
-| E — Homogeneous Initialization with Empirical Variance | `NNN` | sample every added block using the inherited weight variance | No |
+| A — Column-Zero Initialization| `new1=0`; sample the added row with the grown fan-in | Yes |
+| B — Row-First Column-Zero Initialization | sample `new2` with inherited fan-in; `new1=new3=0` | Yes |
+| C — Row-Zero Initialization | sample `new1`; `new2=new3=0` | Yes |
+| D — Homogeneous Initialization | initialize every added block with the default grown-layer rule | No |
+| E — Homogeneous Initialization with Empirical Variance | sample every added block using the inherited weight variance | No |
 
 For ReLU networks, Mode C uses the convention $\phi'(0)=1$ so that zero-valued
 added coordinates can still receive gradients. Existing biases are copied and
