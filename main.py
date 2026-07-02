@@ -31,7 +31,7 @@ def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
             "Compare Big Net with Initialization Modes A-E and GradMax "
-            "where supported. Mode C is Row-Zero Initialization (NZZ)."
+            "where supported. Mode C is Row-Zero Initialization."
         ),
     )
     parser.add_argument("--model", choices=sorted(MODEL_DATASETS))
