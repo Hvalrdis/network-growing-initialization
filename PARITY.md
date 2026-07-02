@@ -3,13 +3,14 @@
 The unified code keeps the experiment mechanics that materially affect the
 comparison:
 
-| Backbone | Optimizer and schedule | Growth timing | Seed and target widths |
-|---|---|---|---|
-| MLP | SGD 0.05, momentum 0.9, cosine per step | after the scheduled batch | 128/64 to 512/256 over 12 growth events |
-| VGG-11 | SGD 0.05, momentum 0.9, cosine per step | after the scheduled batch | one-quarter width to full width over 12 growth events |
-| WRN-28-1 | SGD 0.01, momentum 0.9, cosine per step | after the scheduled batch | one-quarter internal width to full internal width |
-| ViT | AdamW 1e-3, 10-epoch warmup plus cosine, AMP, CutMix | before the scheduled batch | hidden dimension 64 to 256 over 12 growth events |
-| CvT-13 | AdamW 6.25e-5, 20-epoch warmup plus cosine, Mixup/CutMix | before the scheduled batch | stage dimensions (16, 48, 96) to (64, 192, 384) |
+| Backbone | Optimizer and schedule                                   | Seed and target widths                                |
+| -------- | -------------------------------------------------------- | ----------------------------------------------------- |
+| MLP      | SGD 0.05, momentum 0.9, cosine per step                  | 128/64 to 512/256 over 12 growth events               |
+| VGG-11   | SGD 0.05, momentum 0.9, cosine per step                  | one-quarter width to full width over 12 growth events |
+| WRN-28-1 | SGD 0.01, momentum 0.9, cosine per step                  | one-quarter internal width to full internal width     |
+| ViT      | AdamW 1e-3, 10-epoch warmup plus cosine, AMP, CutMix     | hidden dimension 64 to 256 over 12 growth events      |
+| CvT-13   | AdamW 6.25e-5, 20-epoch warmup plus cosine, Mixup/CutMix | stage dimensions (16, 48, 96) to (64, 192, 384)       |
+
 
 For MLP and VGG, GradMax continues to draw its own growth batch as in the source
 programs. WRN continues to use the current batch. Optimizer state is retained
