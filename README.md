@@ -31,13 +31,6 @@ The study addresses three implementation questions:
 The release covers MLP, VGG-11, WRN-28-1, ViT, and CvT-13 on MNIST and CIFAR.
 It includes Modes A–E and, where applicable, the GradMax baseline.
 
-The following curves are an illustrative ViT growth event from the manuscript;
-the reported paper tables use three complete runs per setting.
-
-<p align="center">
-  <img src="assets/vit_accuracy_vs_epochs.png" alt="Illustrative ViT accuracy versus epochs" width="47%">
-  <img src="assets/vit_accuracy_vs_time.png" alt="Illustrative ViT accuracy versus time" width="47%">
-</p>
 
 ## Block-wise initialization
 
