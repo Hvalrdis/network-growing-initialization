@@ -486,16 +486,21 @@ def _transfer_cvt(old_model: CvT, new_model: CvT, mode: str) -> None:
         handled.add(new_p)
 
     def batchnorm(old_bn: nn.BatchNorm2d, new_bn: nn.BatchNorm2d):
-        for old_p, new_p in (
+        new_bn.weight.fill_(1.0)
+        new_bn.bias.zero_()
+        for old_parameter, new_parameter in (
             (old_bn.weight, new_bn.weight),
             (old_bn.bias, new_bn.bias),
         ):
-            new_p.zero_()
-            new_p[: old_p.numel()].copy_(old_p)
+            new_parameter[: old_parameter.numel()].copy_(old_parameter)
             registry.append(
-                (old_p, new_p, lambda old, new: new[: old.numel()].copy_(old))
+                (
+                    old_parameter,
+                    new_parameter,
+                    lambda old, new: new[: old.numel()].copy_(old),
+                )
             )
-            handled.add(new_p)
+            handled.add(new_parameter)
         new_bn.running_mean.zero_()
         new_bn.running_var.fill_(1.0)
         new_bn.running_mean[: old_bn.num_features].copy_(old_bn.running_mean)
