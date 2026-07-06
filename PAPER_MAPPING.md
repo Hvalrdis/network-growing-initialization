@@ -12,7 +12,7 @@ Entry point: `python3 -m nngrow main`.
 |---|---|---:|---|
 | MLP | `--model mlp --dataset mnist` | 200 | widths 512-256; seed width 1/4 |
 | VGG-11 | `--model vgg --dataset cifar10` or `cifar100` | 200 | stride downsampling; no BatchNorm |
-| WRN-28-1 | `--model wrn --dataset cifar10` or `cifar100` | 200 | internal block convolutions grow |
+| WRN-28-1 | `--model wrn --dataset cifar10` or `cifar100` | 200 | GradMax-aligned ReLU1; internal block widths grow |
 | ViT | `--model vit --dataset cifar10` | 200 | D=256, depth=8, H=4, patch=2 |
 | CvT-13 | `--model cvt --dataset cifar10` | 100 | three-stage dimensions 64-192-384 |
 
@@ -32,6 +32,11 @@ configured optimization schedule.
 The CvT-13 preset uses the reported 100-epoch protocol, preserves AdamW state
 across every growth event, and applies the reference timm RandAugment, random
 erasing, Mixup, and CutMix pipeline.
+
+The WRN-28-1 adapter retains the canonical residual output widths while growing
+the internal `Conv1 → BatchNorm → Conv2` path. Its pre-activation blocks use
+`BatchNorm → ReLU1 → Conv1 → BatchNorm → ReLU1 → Conv2`; `ReLU1` sets the
+derivative at zero to 1 to match the GradMax comparison implementation.
 
 Each main run exports train/test accuracy and loss against both wall-clock time
 and epoch, together with the parameter-count trajectory against epoch.
