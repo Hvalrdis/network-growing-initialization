@@ -106,6 +106,15 @@ The main experiments use a common schedule:
 | ViT | CIFAR-10 | $D=256$, depth 8, $H=4$, patch size 2 | AdamW, LR 0.001 | 200 |
 | CvT-13 | CIFAR-10 | stage widths 64–192–384 | AdamW, scaled LR 0.0000625 | 100 |
 
+The WRN-28-1 preset follows the canonical three-stage, pre-activation layout
+with four residual blocks per stage. Each block uses
+`BatchNorm → ReLU1 → Conv3×3 → BatchNorm → ReLU1 → Conv3×3`, where `ReLU1`
+has the standard ReLU forward map and defines its derivative at zero as 1, as
+in the GradMax comparison code. Growth changes only the internal block width:
+it expands the first convolution's output channels, the intervening BatchNorm,
+and the second convolution's input channels. The second convolution's output
+channels, the skip path, and the residual output dimension remain fixed.
+
 ViT uses 10 warmup epochs, label smoothing, global gradient clipping, AMP, and
 CutMix. CvT-13 uses 20 warmup epochs, label smoothing, gradient clipping, and
 the reference VTs-Drloc timm pipeline: random crop and horizontal flip,
