@@ -282,6 +282,67 @@ def _check_cvt_training_protocol() -> None:
     assert optimizer.param_groups[0]["lr"] == config.learning_rate * 1e-3
 
 
+def _check_wrn_protocol() -> None:
+    device = torch.device("cpu")
+    model = model_wrn.build_model(10, device, 1.0, 5)
+    assert model.depth == 28
+    assert [len(group) for group in model.groups] == [4, 4, 4]
+    assert sum(isinstance(module, model_wrn.ReLU1) for module in model.modules()) == 25
+    assert not any(isinstance(module, nn.ReLU) for module in model.modules())
+
+    points = torch.tensor([-1.0, 0.0, 1.0], requires_grad=True)
+    model_wrn.ReLU1()(points).sum().backward()
+    assert torch.equal(points.grad, torch.tensor([0.0, 1.0, 1.0]))
+
+    block = model.groups[0][0]
+    order = []
+    named_modules = (
+        ("bn0", block.bn0),
+        ("relu0", block.relu0),
+        ("conv1", block.conv1),
+        ("mid_norm", block.mid_norm),
+        ("relu1", block.relu1),
+        ("conv2", block.conv2),
+    )
+    handles = [
+        module.register_forward_hook(
+            lambda _module, _inputs, _output, name=name: order.append(name)
+        )
+        for name, module in named_modules
+    ]
+    block.eval()
+    block(torch.randn(2, 16, 8, 8))
+    for handle in handles:
+        handle.remove()
+    assert order == ["bn0", "relu0", "conv1", "mid_norm", "relu1", "conv2"]
+
+    seed = model_wrn.build_model(10, device, 0.25, 7)
+    grown = copy.deepcopy(seed)
+    model_wrn.grow_model(
+        grown,
+        "mode_c",
+        [1] * len(grown.get_grow_layer_tuples()),
+        None,
+        None,
+        None,
+        0,
+    )
+    for old_group, new_group in zip(seed.groups, grown.groups):
+        for old_block, new_block in zip(old_group, new_group):
+            assert new_block.conv1.out_channels == old_block.conv1.out_channels + 1
+            assert new_block.mid_norm.num_features == old_block.mid_norm.num_features + 1
+            assert new_block.conv2.in_channels == old_block.conv2.in_channels + 1
+            assert new_block.conv2.out_channels == old_block.conv2.out_channels
+            assert new_block.bn0.num_features == old_block.bn0.num_features
+            old_skip = None if old_block.skip is None else old_block.skip.weight.shape
+            new_skip = None if new_block.skip is None else new_block.skip.weight.shape
+            assert new_skip == old_skip
+    assert grown.conv_stem.weight.shape == seed.conv_stem.weight.shape
+    assert grown.final_bn.num_features == seed.final_bn.num_features
+    assert grown.fc.weight.shape == seed.fc.weight.shape
+    assert tuple(grown(torch.randn(2, 3, 32, 32)).shape) == (2, 10)
+
+
 def _check_presets() -> None:
     mlp = make_config("mlp", "mnist")
     wrn = make_config("wrn", "cifar10")
@@ -619,6 +680,7 @@ def main() -> None:
     _check_cvt_batchnorm_growth()
     _check_cvt_special_growth_parameters()
     _check_cvt_training_protocol()
+    _check_wrn_protocol()
     _check_transformer_optimizer_state()
     _check_ablation_models()
     _check_presets()
