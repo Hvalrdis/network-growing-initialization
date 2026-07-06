@@ -1,4 +1,4 @@
-"""WRN-28-1 construction and internal-width growth operations."""
+"""WRN-28-1 construction and GradMax-aligned internal-width growth."""
 
 from __future__ import annotations
 
@@ -29,6 +29,8 @@ class _ReLU1Fn(torch.autograd.Function):
 
 
 class ReLU1(nn.Module):
+    """ReLU whose derivative at the origin is defined as one."""
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return _ReLU1Fn.apply(x)
 
@@ -83,6 +85,8 @@ def _add_channels_groupnorm(gn: nn.GroupNorm, k: int) -> None:
 
 
 class WideResNetBasicBlock(nn.Module):
+    """Pre-activation residual block with a growable internal width."""
+
     def __init__(
         self,
         in_channels: int,
